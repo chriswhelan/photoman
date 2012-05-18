@@ -15,6 +15,7 @@
 package com.github.chriswhelan.photoman.controller;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import android.content.Intent;
 
@@ -22,6 +23,7 @@ import com.github.chriswhelan.photoman.domain.PhotoAlbum;
 import com.github.chriswhelan.photoman.domain.PhotoManager;
 import com.github.chriswhelan.photoman.view.PhotoGridViewModel;
 
+@Singleton
 public class PhotomanController {
 
 	private final PhotoManager photoManager;

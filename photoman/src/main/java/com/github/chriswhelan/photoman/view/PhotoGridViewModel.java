@@ -14,6 +14,9 @@
  */
 package com.github.chriswhelan.photoman.view;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import com.github.chriswhelan.photoman.android.AndroidDevice;
 import com.github.chriswhelan.photoman.domain.Photo;
 import com.github.chriswhelan.photoman.domain.PhotoAlbum;
@@ -21,7 +24,7 @@ import com.github.chriswhelan.photoman.view.background.BackgroundTaskFactory;
 import com.github.chriswhelan.photoman.view.background.BackgroundTaskResultHandler;
 import com.github.chriswhelan.photoman.view.background.PhotoThumbnailViewLoaderBackgroundTask;
 
-//TODO: The whole point of a ViewModel is that it doesn't depend on the UI framework, need to push the android imports down into the activity and just expose data
+@Singleton
 public class PhotoGridViewModel {
 
 	private static final int DEFAULT_COLUMN_COUNT = 3;
@@ -31,7 +34,7 @@ public class PhotoGridViewModel {
 
 	private PhotoAlbum photos;
 
-	// TODO: separate concerns, device and factory should be injected but photos is a ctor param
+	@Inject
 	public PhotoGridViewModel(final BackgroundTaskFactory taskFactory, final AndroidDevice thisDevice) {
 		this.taskFactory = taskFactory;
 		this.thisDevice = thisDevice;

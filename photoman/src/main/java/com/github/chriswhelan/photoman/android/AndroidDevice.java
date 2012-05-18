@@ -15,10 +15,12 @@
 package com.github.chriswhelan.photoman.android;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+@Singleton
 public class AndroidDevice {
 
 	private final WindowManager windowManager;

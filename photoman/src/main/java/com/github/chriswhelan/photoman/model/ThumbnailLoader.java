@@ -15,6 +15,7 @@
 package com.github.chriswhelan.photoman.model;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import android.graphics.Bitmap;
 
@@ -22,6 +23,7 @@ import com.github.chriswhelan.photoman.model.android.bitmap.BitmapLoader;
 import com.github.chriswhelan.photoman.view.ThumbnailPhotoProjection;
 import com.github.chriswhelan.photoman.view.ThumbnailQuery;
 
+@Singleton
 public class ThumbnailLoader {
 
 	private final BitmapLoader bitmapLoader;
@@ -35,7 +37,7 @@ public class ThumbnailLoader {
 		final String uri = query.getUri();
 		final PhotoDimension dimensions = bitmapLoader.loadDimensions(uri);
 		final int sampleSize = calculateThumbnailSampleSize(dimensions, query.getTargetSize());
-		Bitmap thumbnail = bitmapLoader.load(uri, sampleSize);
+		final Bitmap thumbnail = bitmapLoader.load(uri, sampleSize);
 		return new ThumbnailPhotoProjection(thumbnail);
 	}
 

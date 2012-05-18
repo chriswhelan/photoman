@@ -15,9 +15,12 @@
 package com.github.chriswhelan.photoman.domain;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.github.chriswhelan.photoman.model.PhotoProvider;
 
+@Singleton
+// TODO: Should we go to a provider from the manager? Or should the provider be hidden behind a (a or the?) photo repository
 public class PhotoManager {
 
 	private final PhotoProvider photoProvider;

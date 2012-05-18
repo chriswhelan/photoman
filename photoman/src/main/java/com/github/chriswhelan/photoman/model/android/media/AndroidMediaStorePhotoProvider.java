@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -32,6 +33,7 @@ import com.github.chriswhelan.photoman.model.PhotoProvider;
 
 import de.akquinet.android.androlog.Log;
 
+@Singleton
 public class AndroidMediaStorePhotoProvider implements PhotoProvider {
 
 	private final ContentResolver contentResolver;

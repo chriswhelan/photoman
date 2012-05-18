@@ -14,11 +14,14 @@
  */
 package com.github.chriswhelan.photoman.model.android.bitmap;
 
+import javax.inject.Singleton;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.github.chriswhelan.photoman.model.PhotoDimension;
 
+@Singleton
 public class AndroidFactoryBitmapLoader implements BitmapLoader {
 
 	@Override

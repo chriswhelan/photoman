@@ -15,11 +15,12 @@
 package com.github.chriswhelan.photoman.model;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.github.chriswhelan.photoman.view.ThumbnailPhotoProjection;
 import com.github.chriswhelan.photoman.view.ThumbnailQuery;
 
-//TODO: Separate out the domain 'photo' repository parts from the view repository parts.
+@Singleton
 public class PhotoRepository {
 
 	// TODO: Can introduce caching here by injecting a cached decorator

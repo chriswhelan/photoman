@@ -12,25 +12,19 @@
  * You should have received a copy of the GNU General Public License along with Photo Man.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.chriswhelan.photoman.view.background;
+package com.github.chriswhelan.photoman.container;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.github.chriswhelan.photoman.model.PhotoProvider;
+import com.github.chriswhelan.photoman.model.android.bitmap.AndroidFactoryBitmapLoader;
+import com.github.chriswhelan.photoman.model.android.bitmap.BitmapLoader;
+import com.github.chriswhelan.photoman.model.android.media.AndroidMediaStorePhotoProvider;
+import com.google.inject.AbstractModule;
 
-import com.github.chriswhelan.photoman.model.PhotoRepository;
-import com.github.chriswhelan.photoman.view.ThumbnailPhotoProjection;
+public class PhotoManModule extends AbstractModule {
 
-@Singleton
-public class BackgroundTaskFactory {
-
-	private final PhotoRepository photoRepository;
-
-	@Inject
-	public BackgroundTaskFactory(final PhotoRepository photoRepository) {
-		this.photoRepository = photoRepository;
-	}
-
-	public PhotoThumbnailViewLoaderBackgroundTask createBackgroundTask(final BackgroundTaskResultHandler<ThumbnailPhotoProjection> handler) {
-		return new PhotoThumbnailViewLoaderBackgroundTask(handler, photoRepository);
+	@Override
+	protected void configure() {
+		bind(PhotoProvider.class).to(AndroidMediaStorePhotoProvider.class);
+		bind(BitmapLoader.class).to(AndroidFactoryBitmapLoader.class);
 	}
 }
