@@ -12,6 +12,7 @@
     <modules>
         <module>photoman</module>
         <module>photoman-it</module>
+        <module>photoman-test</module>
     </modules>
 
     <properties>

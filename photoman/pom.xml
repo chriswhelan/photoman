@@ -6,6 +6,7 @@
     <groupId>com.github.chriswhelan</groupId>
     <artifactId>photoman-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <relativePath>..</relativePath>
   </parent>
 
   <artifactId>photoman</artifactId>
@@ -20,6 +21,11 @@
     <dependency>
       <groupId>de.akquinet.android.androlog</groupId>
       <artifactId>androlog</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.roboguice</groupId>
+      <artifactId>roboguice</artifactId>
+      <version>2.0</version>
     </dependency>
   </dependencies>
 
