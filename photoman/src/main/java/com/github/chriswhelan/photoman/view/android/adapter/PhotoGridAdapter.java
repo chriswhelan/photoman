@@ -58,12 +58,26 @@ public class PhotoGridAdapter extends BaseAdapter {
 	@Override
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
 		final ImageView imageView = recycleView(convertView);
-		final AsyncThumbnailHandler handler = new AsyncThumbnailHandler(imageView);
-		imageView.setImageDrawable(new InProgressDrawable(handler));
-		// TODO: Need to cancel currently in progress task before starting a new one, but this needs a reference to the Task object in the
-		// view...
-		viewModel.updateThumbnail(position, handler);
+
+		final int previousPosition = getPreviousInProgressPosition(imageView);
+		if (position == previousPosition)
+			return imageView;
+
+		if (previousPosition != -1)
+			viewModel.cancelLoadThumbnail(previousPosition);
+
+		imageView.setImageDrawable(new InProgressDrawable(position));
+		viewModel.loadThumbnail(position, new AsyncThumbnailHandler(position, imageView));
 		return imageView;
+	}
+
+	// TODO: Replace -1 with Option pattern
+	private int getPreviousInProgressPosition(final ImageView imageView) {
+		final Drawable drawable = imageView.getDrawable();
+		if (!(drawable instanceof InProgressDrawable))
+			return -1;
+
+		return ((InProgressDrawable) drawable).getPosition();
 	}
 
 	// TODO: Are you trying to reuse the same LayoutParams object across all rows? That could be your problem. – CommonsWare Mar 23 '10 at
@@ -97,27 +111,25 @@ public class PhotoGridAdapter extends BaseAdapter {
 	// reference for concurrency check and BTRH would have to use a WeakReference to it's handler again which seems odd
 	private static class InProgressDrawable extends ColorDrawable {
 
-		private final WeakReference<AsyncThumbnailHandler> handlerReference;
+		private final int position;
 
-		public InProgressDrawable(final AsyncThumbnailHandler handler) {
+		public InProgressDrawable(final int position) {
 			super(Color.BLACK);
-			handlerReference = new WeakReference<AsyncThumbnailHandler>(handler);
+			this.position = position;
 		}
 
-		public AsyncThumbnailHandler getHandler() {
-			// TODO: Is this null check necessary? look at documentation for WeakRef. And in this scenario will the ref always be held
-			// anyway?
-			if (handlerReference == null)
-				return null;
-			return handlerReference.get();
+		public int getPosition() {
+			return position;
 		}
 	}
 
 	private static class AsyncThumbnailHandler implements BackgroundTaskResultHandler<ThumbnailPhotoProjection> {
 
+		private final int position;
 		private final WeakReference<ImageView> imageViewReference;
 
-		public AsyncThumbnailHandler(final ImageView imageView) {
+		public AsyncThumbnailHandler(final int position, final ImageView imageView) {
+			this.position = position;
 			imageViewReference = new WeakReference<ImageView>(imageView);
 		}
 
@@ -127,23 +139,23 @@ public class PhotoGridAdapter extends BaseAdapter {
 				return;
 
 			final ImageView imageView = imageViewReference.get();
-			if (isValidHandler(imageView))
+			if (position == getPosition(imageView))
 				imageView.setImageBitmap(result.getThumbnail());
 		}
 
-		private boolean isValidHandler(final ImageView imageView) {
-			return imageView != null && getHandler(imageView) == this;
+		private int getPosition(final ImageView imageView) {
+			if (imageView == null)
+				return -1;
+
+			return getPosition(imageView.getDrawable());
 		}
 
-		private AsyncThumbnailHandler getHandler(final ImageView imageView) {
-			final Drawable drawable = imageView.getDrawable();
-
+		private int getPosition(final Drawable drawable) {
 			if (!(drawable instanceof InProgressDrawable))
-				return null;
+				return -1;
 
-			// TODO: Need an Option pattern here to clean this code up
 			final InProgressDrawable inProgressDrawable = (InProgressDrawable) drawable;
-			return inProgressDrawable.getHandler();
+			return inProgressDrawable.getPosition();
 		}
 	}
 }

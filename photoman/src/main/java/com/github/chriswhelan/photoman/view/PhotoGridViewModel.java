@@ -14,6 +14,9 @@
  */
 package com.github.chriswhelan.photoman.view;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -31,6 +34,9 @@ public class PhotoGridViewModel {
 
 	private final BackgroundTaskFactory taskFactory;
 	private final AndroidDevice thisDevice;
+
+	// TODO: Confirm task reference is dropped when completed
+	private final Map<Integer, PhotoThumbnailViewLoaderBackgroundTask> tasks = new WeakHashMap<Integer, PhotoThumbnailViewLoaderBackgroundTask>();
 
 	private PhotoAlbum photos;
 
@@ -50,11 +56,18 @@ public class PhotoGridViewModel {
 	}
 
 	// TODO: use VTO which contains Bitmap not Bitmap itself
-	public void updateThumbnail(final int position, final BackgroundTaskResultHandler<ThumbnailPhotoProjection> handler) {
+	public void loadThumbnail(final int position, final BackgroundTaskResultHandler<ThumbnailPhotoProjection> handler) {
 		final PhotoThumbnailViewLoaderBackgroundTask task = taskFactory.createBackgroundTask(handler);
+		tasks.put(position, task);
 		final Photo photo = photos.get(position);
 		final ThumbnailQuery query = new ThumbnailQuery(photo.getUri(), getImageSize());
 		task.execute(query);
+	}
+
+	public void cancelLoadThumbnail(final int position) {
+		final PhotoThumbnailViewLoaderBackgroundTask task = tasks.get(position);
+		if (task != null)
+			task.cancel(true);
 	}
 
 	public int getNumberOfColumns() {
