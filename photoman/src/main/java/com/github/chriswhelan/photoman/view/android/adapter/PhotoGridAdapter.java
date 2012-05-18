@@ -80,15 +80,13 @@ public class PhotoGridAdapter extends BaseAdapter {
 		return ((InProgressDrawable) drawable).getPosition();
 	}
 
-	// TODO: Are you trying to reuse the same LayoutParams object across all rows? That could be your problem. – CommonsWare Mar 23 '10 at
-	// 0:10
+	// TODO: Are you trying to reuse the same LayoutParams object across all rows?
+	// That could be your problem. – CommonsWare Mar 23 '10 at 0:10
 	// Aha, yes, that was it. I assumed that when layout parameters were set using a LayoutParams object, the View copied the values out of
 	// the LayoutParams, leaving it free to be reused. That was not the case, and the object remained somehow tied to the View. Creating a
 	// new LayoutParams for each row did the trick and everything now works properly. Thanks!
-
 	private ImageView recycleView(final View view) {
-		// TODO: will instanceof on null throw NPE or return false? If false, null check is redundant.
-		if (view != null && view instanceof ImageView)
+		if (view instanceof ImageView)
 			return (ImageView) view;
 		return createView();
 	}
@@ -103,10 +101,9 @@ public class PhotoGridAdapter extends BaseAdapter {
 	}
 
 	// TODO: Change to use BitmapDrawable and pass in a Bitmap for in progress (need to eventually layer progressbar on top of this)
-	// TODO: Still need tests around all this null checking logic, even if it is hard with Android dependencies
-	// TODO: Why not create a subclass of ImageView instead of Drawable, then we can ask the ImageView for it's handler without ugly casting
-	// Could store the AsyncThumbnailHandler as an ImageView member, but this won't be GC'd when setImageBitmap is called - could always
-	// implement that internally though
+	// TODO: Why not create a subclass of ImageView instead of Drawable, then we can ask the ImageView for it's position without ugly
+	// casting
+	// Could store the position as an ImageView member
 	// Could also make the ImageView implement BTRH<PTV> itself so we don't even create an extra object - but would then need to use a Task
 	// reference for concurrency check and BTRH would have to use a WeakReference to it's handler again which seems odd
 	private static class InProgressDrawable extends ColorDrawable {
