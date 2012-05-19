@@ -17,17 +17,27 @@ package com.github.chriswhelan.photoman.android;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import android.app.ActivityManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 @Singleton
 public class AndroidDevice {
 
+	private static final int BYTES_IN_A_MEGABYTE = 1024 * 1024;
+
 	private final WindowManager windowManager;
+	private final ActivityManager activityManager;
 
 	@Inject
-	public AndroidDevice(final WindowManager windowManager) {
+	public AndroidDevice(final WindowManager windowManager, final ActivityManager activityManager) {
 		this.windowManager = windowManager;
+		this.activityManager = activityManager;
+	}
+
+	// TODO: Separate memory methods to a different interface from display methods
+	public int getMaximumMemory() {
+		return activityManager.getLargeMemoryClass() * BYTES_IN_A_MEGABYTE;
 	}
 
 	public int getDisplayWidthInPixels() {

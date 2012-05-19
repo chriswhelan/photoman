@@ -21,7 +21,6 @@ import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.widget.GridView;
-import android.widget.ListAdapter;
 
 import com.github.chriswhelan.photoman.R;
 import com.github.chriswhelan.photoman.controller.PhotomanController;
@@ -33,10 +32,13 @@ public class PhotoGridActivity extends RoboActivity {
 
 	// TODO: does this mean guice will only actually instantiate the tree for this intent/viewmodel?
 	// or does it instantiate everything at the start?
-	// where is my 'configuretheapp' central container config?
 	// Need tests to confirm that a given intent only boots up the necessary sub-tree of the system
 	@Inject
 	private PhotomanController controller;
+	@Inject
+	private PhotoGridViewModel viewModel;
+	@Inject
+	private PhotoGridAdapter photoGridAdapter;
 
 	@InjectView(R.id.gridView1)
 	private GridView gridView;
@@ -45,15 +47,13 @@ public class PhotoGridActivity extends RoboActivity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO: how do we ensure that only the necessary components needed for this activity are created here and not the entire tree?
-		final PhotoGridViewModel viewModel = controller.handleIntent(getIntent());
+		controller.handleIntent(getIntent());
 
-		// TODO: make sure the activity isn't being leaked on orientation change
 		gridView.setNumColumns(viewModel.getNumberOfColumns());
-		gridView.setAdapter(getGridViewAdapter(viewModel));
-
-		// final Loader<Cursor> cursorLoader = new CursorLoader(this);
+		gridView.setAdapter(photoGridAdapter);
 	}
+
+	// final Loader<Cursor> cursorLoader = new CursorLoader(this);
 
 	// TODO: could shrink the cache here. Is there an application level equivalent? - this is just a hack though, better to avoid entirely
 	// Also lookinto onTrimMemory
@@ -77,14 +77,10 @@ public class PhotoGridActivity extends RoboActivity {
 	// public void onLoaderReset(final Loader<Cursor> loader) {
 	// }
 
-	private ListAdapter getGridViewAdapter(final PhotoGridViewModel viewModel) {
-		return new PhotoGridAdapter(this, viewModel);
-
-		// TODO: FLAG_REGISTER_CONTENT_OBSERVER If set the adapter will register a content observer on the cursor and will call
-		// onContentChanged() when a notification comes in.
-		// return new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null,
-		// new String[] { MediaStore.Images.Thumbnails.IMAGE_ID }, new int[] { android.R.id.text1, android.R.id.text2 }, 0);
-	}
+	// TODO: FLAG_REGISTER_CONTENT_OBSERVER If set the adapter will register a content observer on the cursor and will call
+	// onContentChanged() when a notification comes in.
+	// return new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null,
+	// new String[] { MediaStore.Images.Thumbnails.IMAGE_ID }, new int[] { android.R.id.text1, android.R.id.text2 }, 0);
 
 	// TODO: some crap from a dodgy codebase. Does it make any sense?
 	// @Override

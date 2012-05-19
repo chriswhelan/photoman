@@ -16,27 +16,32 @@ package com.github.chriswhelan.photoman.view.android.adapter;
 
 import java.lang.ref.WeakReference;
 
-import android.content.Context;
+import javax.inject.Inject;
+
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.github.chriswhelan.photoman.R;
 import com.github.chriswhelan.photoman.view.PhotoGridViewModel;
 import com.github.chriswhelan.photoman.view.ThumbnailPhotoProjection;
 import com.github.chriswhelan.photoman.view.background.BackgroundTaskResultHandler;
 
 public class PhotoGridAdapter extends BaseAdapter {
 
-	private final Context context;
+	private final LayoutInflater layoutInflater;
 	private final PhotoGridViewModel viewModel;
 
-	public PhotoGridAdapter(final Context context, final PhotoGridViewModel viewModel) {
-		this.context = context;
+	// TODO: Confirm a new instance is injected every time on configuration change
+	@Inject
+	public PhotoGridAdapter(final LayoutInflater layoutInflater, final PhotoGridViewModel viewModel) {
+		this.layoutInflater = layoutInflater;
 		this.viewModel = viewModel;
 	}
 
@@ -57,7 +62,7 @@ public class PhotoGridAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
-		final ImageView imageView = recycleView(convertView);
+		final ImageView imageView = recycleView(parent, convertView);
 
 		final int previousPosition = getPreviousInProgressPosition(imageView);
 		if (position == previousPosition)
@@ -85,19 +90,20 @@ public class PhotoGridAdapter extends BaseAdapter {
 	// Aha, yes, that was it. I assumed that when layout parameters were set using a LayoutParams object, the View copied the values out of
 	// the LayoutParams, leaving it free to be reused. That was not the case, and the object remained somehow tied to the View. Creating a
 	// new LayoutParams for each row did the trick and everything now works properly. Thanks!
-	private ImageView recycleView(final View view) {
-		if (view instanceof ImageView)
-			return (ImageView) view;
-		return createView();
+	private ImageView recycleView(final ViewGroup parent, final View convertView) {
+		if (convertView instanceof ImageView)
+			return (ImageView) convertView;
+		return createView(parent);
 	}
 
-	// TODO: Can we inflate the imageview from an XML layout and avoid the need for a context?
-	private ImageView createView() {
-		final ImageView imageView = new ImageView(context);
-		final int size = viewModel.getImageSize();
-		imageView.setLayoutParams(new GridView.LayoutParams(size, size));
-		imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+	private ImageView createView(final ViewGroup parent) {
+		final ImageView imageView = (ImageView) layoutInflater.inflate(R.layout.thumbnail, parent, false);
+		imageView.setLayoutParams(layoutParams(viewModel.getImageSize()));
 		return imageView;
+	}
+
+	private GridView.LayoutParams layoutParams(final int size) {
+		return new GridView.LayoutParams(size, size);
 	}
 
 	// TODO: Change to use BitmapDrawable and pass in a Bitmap for in progress (need to eventually layer progressbar on top of this)

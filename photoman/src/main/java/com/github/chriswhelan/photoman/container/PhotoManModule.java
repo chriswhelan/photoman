@@ -14,11 +14,15 @@
  */
 package com.github.chriswhelan.photoman.container;
 
+import com.github.chriswhelan.photoman.model.CachingThumbnailLoader;
+import com.github.chriswhelan.photoman.model.DefaultThumbnailLoader;
 import com.github.chriswhelan.photoman.model.PhotoProvider;
+import com.github.chriswhelan.photoman.model.ThumbnailLoader;
 import com.github.chriswhelan.photoman.model.android.bitmap.AndroidFactoryBitmapLoader;
 import com.github.chriswhelan.photoman.model.android.bitmap.BitmapLoader;
 import com.github.chriswhelan.photoman.model.android.media.AndroidMediaStorePhotoProvider;
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 public class PhotoManModule extends AbstractModule {
 
@@ -26,5 +30,7 @@ public class PhotoManModule extends AbstractModule {
 	protected void configure() {
 		bind(PhotoProvider.class).to(AndroidMediaStorePhotoProvider.class);
 		bind(BitmapLoader.class).to(AndroidFactoryBitmapLoader.class);
+		bind(ThumbnailLoader.class).to(CachingThumbnailLoader.class);
+		bind(ThumbnailLoader.class).annotatedWith(Names.named(CachingThumbnailLoader.BASE)).to(DefaultThumbnailLoader.class);
 	}
 }

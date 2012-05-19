@@ -55,7 +55,7 @@ public class PhotoGridViewModel {
 		return photos.count();
 	}
 
-	// TODO: use VTO which contains Bitmap not Bitmap itself
+	// TODO: don't need to spawn a background thread if image can be resolved from memory. Push task mgmt further down stack to handle this.
 	public void loadThumbnail(final int position, final BackgroundTaskResultHandler<ThumbnailPhotoProjection> handler) {
 		final PhotoThumbnailViewLoaderBackgroundTask task = taskFactory.createBackgroundTask(handler);
 		tasks.put(position, task);

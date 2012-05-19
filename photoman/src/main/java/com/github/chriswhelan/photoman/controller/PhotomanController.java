@@ -35,19 +35,20 @@ public class PhotomanController {
 		this.photoGridViewModel = photoGridViewModel;
 	}
 
-	public PhotoGridViewModel handleIntent(final Intent intent) {
+	public void handleIntent(final Intent intent) {
 		// TODO: Use a pattern to discern correct handler
-		if (isDefaultLauncherIntent(intent))
-			return handleOpenApplicationIntent();
+		if (isDefaultLauncherIntent(intent)) {
+			handleOpenApplicationIntent();
+			return;
+		}
 
 		// TODO: Proper logging, an actual exception handling strategy... etc
 		throw new UnsupportedOperationException("unrecognized intent");
 	}
 
-	private PhotoGridViewModel handleOpenApplicationIntent() {
+	private void handleOpenApplicationIntent() {
 		final PhotoAlbum photos = photoManager.getAllPhotos();
 		photoGridViewModel.setPhotoAlbum(photos);
-		return photoGridViewModel;
 	}
 
 	private boolean isDefaultLauncherIntent(final Intent intent) {

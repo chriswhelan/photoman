@@ -14,37 +14,11 @@
  */
 package com.github.chriswhelan.photoman.model;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import android.graphics.Bitmap;
-
-import com.github.chriswhelan.photoman.model.android.bitmap.BitmapLoader;
 import com.github.chriswhelan.photoman.view.ThumbnailPhotoProjection;
 import com.github.chriswhelan.photoman.view.ThumbnailQuery;
 
-@Singleton
-public class ThumbnailLoader {
+public interface ThumbnailLoader {
 
-	private final BitmapLoader bitmapLoader;
+	ThumbnailPhotoProjection loadThumbnail(ThumbnailQuery query);
 
-	@Inject
-	public ThumbnailLoader(final BitmapLoader bitmapLoader) {
-		this.bitmapLoader = bitmapLoader;
-	}
-
-	public ThumbnailPhotoProjection loadThumbnail(final ThumbnailQuery query) {
-		final String uri = query.getUri();
-		final PhotoDimension dimensions = bitmapLoader.loadDimensions(uri);
-		final int sampleSize = calculateThumbnailSampleSize(dimensions, query.getTargetSize());
-		final Bitmap thumbnail = bitmapLoader.load(uri, sampleSize);
-		return new ThumbnailPhotoProjection(thumbnail);
-	}
-
-	// TODO: Scaling the smallest edge only atm - bad idea for panoramas
-	// TODO: Confirm a ratio of x.9 would round to x and not x + 1
-	private int calculateThumbnailSampleSize(final PhotoDimension dimensions, final int targetSize) {
-		final int photoSize = Math.min(dimensions.getWidth(), dimensions.getHeight());
-		return photoSize / targetSize;
-	}
 }

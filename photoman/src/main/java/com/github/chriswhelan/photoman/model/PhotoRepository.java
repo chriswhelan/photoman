@@ -23,7 +23,6 @@ import com.github.chriswhelan.photoman.view.ThumbnailQuery;
 @Singleton
 public class PhotoRepository {
 
-	// TODO: Can introduce caching here by injecting a cached decorator
 	// TODO: Should we have separate repositories for thumbnails and detail? *might* need cache-size co-ordination, but prob won't cache
 	// full bitmaps
 	private final ThumbnailLoader thumbnailLoader;

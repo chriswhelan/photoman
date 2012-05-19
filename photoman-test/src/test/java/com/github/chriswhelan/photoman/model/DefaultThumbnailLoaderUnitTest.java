@@ -29,7 +29,7 @@ import com.github.chriswhelan.photoman.model.android.bitmap.BitmapLoader;
 import com.github.chriswhelan.photoman.view.ThumbnailQuery;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ThumbnailLoaderUnitTest {
+public class DefaultThumbnailLoaderUnitTest {
 
 	@Mock
 	private BitmapLoader bitmapLoader;
@@ -38,7 +38,7 @@ public class ThumbnailLoaderUnitTest {
 
 	@Before
 	public void init() {
-		loader = new ThumbnailLoader(bitmapLoader);
+		loader = new DefaultThumbnailLoader(bitmapLoader);
 	}
 
 	@Test
