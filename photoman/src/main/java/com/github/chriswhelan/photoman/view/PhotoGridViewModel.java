@@ -36,7 +36,7 @@ public class PhotoGridViewModel {
 	private final AndroidDevice thisDevice;
 
 	// TODO: Confirm task reference is dropped when completed
-	private final Map<Integer, PhotoThumbnailViewLoaderBackgroundTask> tasks = new WeakHashMap<Integer, PhotoThumbnailViewLoaderBackgroundTask>();
+	private final Map<GridViewPosition, PhotoThumbnailViewLoaderBackgroundTask> tasks = new WeakHashMap<GridViewPosition, PhotoThumbnailViewLoaderBackgroundTask>();
 
 	private PhotoAlbum photos;
 
@@ -56,15 +56,15 @@ public class PhotoGridViewModel {
 	}
 
 	// TODO: don't need to spawn a background thread if image can be resolved from memory. Push task mgmt further down stack to handle this.
-	public void loadThumbnail(final int position, final BackgroundTaskResultHandler<ThumbnailPhotoProjection> handler) {
+	public void loadThumbnail(final GridViewPosition position, final BackgroundTaskResultHandler<ThumbnailPhotoProjection> handler) {
 		final PhotoThumbnailViewLoaderBackgroundTask task = taskFactory.createBackgroundTask(handler);
 		tasks.put(position, task);
-		final Photo photo = photos.get(position);
+		final Photo photo = photos.get(position.getPosition());
 		final ThumbnailQuery query = new ThumbnailQuery(photo.getUri(), getImageSize());
 		task.execute(query);
 	}
 
-	public void cancelLoadThumbnail(final int position) {
+	public void cancelLoadThumbnail(final GridViewPosition position) {
 		final PhotoThumbnailViewLoaderBackgroundTask task = tasks.get(position);
 		if (task != null)
 			task.cancel(true);
@@ -82,5 +82,18 @@ public class PhotoGridViewModel {
 	// TODO: Also need to be aware if the current image is a panorama/double size image
 	public int getImageSize() {
 		return thisDevice.getDisplayWidthInPixels() / getNumberOfColumns();
+	}
+
+	public static class GridViewPosition {
+
+		private final int position;
+
+		public GridViewPosition(final int position) {
+			this.position = position;
+		}
+
+		public int getPosition() {
+			return position;
+		}
 	}
 }

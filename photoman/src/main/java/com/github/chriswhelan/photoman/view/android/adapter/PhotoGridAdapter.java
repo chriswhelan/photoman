@@ -30,6 +30,7 @@ import android.widget.ImageView;
 
 import com.github.chriswhelan.photoman.R;
 import com.github.chriswhelan.photoman.view.PhotoGridViewModel;
+import com.github.chriswhelan.photoman.view.PhotoGridViewModel.GridViewPosition;
 import com.github.chriswhelan.photoman.view.ThumbnailPhotoProjection;
 import com.github.chriswhelan.photoman.view.background.BackgroundTaskResultHandler;
 
@@ -64,23 +65,24 @@ public class PhotoGridAdapter extends BaseAdapter {
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
 		final ImageView imageView = recycleView(parent, convertView);
 
-		final int previousPosition = getPreviousInProgressPosition(imageView);
-		if (position == previousPosition)
+		final GridViewPosition previousPosition = getPreviousInProgressPosition(imageView);
+		if (previousPosition != null && position == previousPosition.getPosition())
 			return imageView;
 
-		if (previousPosition != -1)
+		if (previousPosition != null)
 			viewModel.cancelLoadThumbnail(previousPosition);
 
-		imageView.setImageDrawable(new InProgressDrawable(position));
-		viewModel.loadThumbnail(position, new AsyncThumbnailHandler(position, imageView));
+		final GridViewPosition gridViewPosition = new GridViewPosition(position);
+		imageView.setImageDrawable(new InProgressDrawable(gridViewPosition));
+		viewModel.loadThumbnail(gridViewPosition, new AsyncThumbnailHandler(gridViewPosition, imageView));
 		return imageView;
 	}
 
 	// TODO: Replace -1 with Option pattern
-	private int getPreviousInProgressPosition(final ImageView imageView) {
+	private GridViewPosition getPreviousInProgressPosition(final ImageView imageView) {
 		final Drawable drawable = imageView.getDrawable();
 		if (!(drawable instanceof InProgressDrawable))
-			return -1;
+			return null;
 
 		return ((InProgressDrawable) drawable).getPosition();
 	}
@@ -114,48 +116,53 @@ public class PhotoGridAdapter extends BaseAdapter {
 	// reference for concurrency check and BTRH would have to use a WeakReference to it's handler again which seems odd
 	private static class InProgressDrawable extends ColorDrawable {
 
-		private final int position;
+		private final GridViewPosition position;
 
-		public InProgressDrawable(final int position) {
+		public InProgressDrawable(final GridViewPosition position) {
 			super(Color.BLACK);
 			this.position = position;
 		}
 
-		public int getPosition() {
+		public GridViewPosition getPosition() {
 			return position;
 		}
 	}
 
 	private static class AsyncThumbnailHandler implements BackgroundTaskResultHandler<ThumbnailPhotoProjection> {
 
-		private final int position;
+		private final WeakReference<GridViewPosition> positionReference;
 		private final WeakReference<ImageView> imageViewReference;
 
-		public AsyncThumbnailHandler(final int position, final ImageView imageView) {
-			this.position = position;
+		public AsyncThumbnailHandler(final GridViewPosition gridViewPosition, final ImageView imageView) {
+			positionReference = new WeakReference<GridViewPosition>(gridViewPosition);
 			imageViewReference = new WeakReference<ImageView>(imageView);
 		}
 
 		@Override
 		public void handleResult(final ThumbnailPhotoProjection result) {
-			if (imageViewReference == null || result == null)
+			if (imageViewReference == null || positionReference == null || result == null)
 				return;
 
 			final ImageView imageView = imageViewReference.get();
+			final GridViewPosition position = positionReference.get();
+
+			if (imageView == null || position == null)
+				return;
+
 			if (position == getPosition(imageView))
 				imageView.setImageBitmap(result.getThumbnail());
 		}
 
-		private int getPosition(final ImageView imageView) {
+		private GridViewPosition getPosition(final ImageView imageView) {
 			if (imageView == null)
-				return -1;
+				return null;
 
 			return getPosition(imageView.getDrawable());
 		}
 
-		private int getPosition(final Drawable drawable) {
+		private GridViewPosition getPosition(final Drawable drawable) {
 			if (!(drawable instanceof InProgressDrawable))
-				return -1;
+				return null;
 
 			final InProgressDrawable inProgressDrawable = (InProgressDrawable) drawable;
 			return inProgressDrawable.getPosition();
